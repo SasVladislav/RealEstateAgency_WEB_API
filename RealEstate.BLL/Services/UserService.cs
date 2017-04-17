@@ -42,33 +42,27 @@ namespace RealEstateAgency.BLL.Services
         {
             return await service.GetAllItemsAsync(where);
         }
-        public List<UserViewDTO> GetUsersViewList(
-            List<UserDTO> usersList, List<AddressDTO> addressesList)
-        {
-            List<UserViewDTO> listUsersView = new List<UserViewDTO>();
-            Parallel.ForEach(usersList, item =>
-             {
-                 listUsersView.Add(
-                                  new UserViewDTO
-                                  {
-                                      Person = item,
-                                      Address = addressesList
-                                          .Where(a => a.AddressID == item.AddressID)
-                                          .AsParallel()
-                                          .FirstOrDefault()
-                                  }
-                                 );
-             });
-            return listUsersView;
-        }
+        
         public async Task<List<UserViewDTO>> GetAllUsersViewAsync(Expression<Func<UserDTO, bool>> where = null)
         {        
             List<UserDTO> listUsers = new List<UserDTO>();
             List<AddressDTO> listAddresses = new List<AddressDTO>();
 
+            
+
             listUsers = await this.GetAllUsersAsync();
             listAddresses = await kernel.Get<IAddressService>().GetAllAddressesAsync();
-            return GetUsersViewList(listUsers, listAddresses);
+
+            List<UserViewDTO> AllList = listUsers.Join(
+                listAddresses,
+                u => u.AddressID,
+                a => a.AddressID,
+                (u, a) => new UserViewDTO {                  
+                        Person =u,
+                        Address=a
+                }).ToList();
+
+            return AllList; 
 
         }
 
@@ -122,7 +116,7 @@ namespace RealEstateAgency.BLL.Services
 
             if (userFilterModel.Name != "" && userFilterModel.Surname != "" && userFilterModel.Patronumic == "")
                 list = list.Where(x => x.Person.Name == userFilterModel.Name && x.Person.Surname == userFilterModel.Surname
-                                    || x.Person.Surname == userFilterModel.Name && x.Person.Patronumic == userFilterModel.Surname
+                                    || x.Person.Surname == userFilterModel.Name && x.Person.Name == userFilterModel.Surname
                                     || x.Person.Name == userFilterModel.Name && x.Person.Patronumic == userFilterModel.Surname).ToList();
 
             if (userFilterModel.Name != "" && userFilterModel.Surname != "" && userFilterModel.Patronumic != "")

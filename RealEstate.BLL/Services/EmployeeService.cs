@@ -51,24 +51,22 @@ namespace RealEstateAgency.BLL.Services
             List<AddressDTO>  listAddresses = await AddressService.GetAllAddressesAsync();
             List<EmployeeDismissDTO>  listDismiss = await DismissService.GetAllEmployeeDismissesAsync();
 
-            Parallel.ForEach(listEmployees, item =>
-             {
-                 listEmployeeView.Add(
-                                  new EmployeeViewDTO
-                                  {
-                                      Person = item,
-                                      Address = listAddresses
-                                                   .Where(a => a.AddressID == item.AddressID)
-                                                   .AsParallel()
-                                                   .FirstOrDefault(),
-                                      Dismisses = listDismiss
-                                                   .Where(a => a.EmployeeId == item.PersonId)
-                                                   .AsParallel()
-                                                   .ToList()
-                                  }
-                                 );
-             });
-            return listEmployeeView;
+            List<EmployeeViewDTO> AllList = listEmployees
+                .Join(
+                    listAddresses,
+                    e => e.AddressID,
+                    a => a.AddressID,
+                    (e, a) => new EmployeeViewDTO
+                    {
+
+                        Person = e,
+                        Address = a,
+                        Dismisses= listDismiss
+                                    .Where(d=>d.EmployeeId==e.PersonId)
+                                    .ToList()
+                    }).ToList();
+
+            return AllList;
         }
         public async Task<EmployeeDTO> GetEmployeeByIdAsync(string id)
         {
