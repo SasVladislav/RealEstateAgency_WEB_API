@@ -172,18 +172,27 @@ namespace RealEstateAgency.BLL.Services
             repository.Dispose();
         }
 
-        public async Task<List<EmployeeDTO>> FilterEmployeeAsync(EmployeeFilterModel employeeFilter)
+        public async Task<List<EmployeeViewDTO>> FilterEmployeeAsync(EmployeeFilterModel employeeFilter)
         {
-            List<EmployeeDTO> list = await this.GetAllEmployeesAsync();
-            if (employeeFilter.Name != null) list = list.Where(emp => emp.Name == employeeFilter.Name).ToList();
-            if (employeeFilter.Surname != null) list = list.Where(emp => emp.Surname == employeeFilter.Surname).ToList();
-            if (employeeFilter.Patronumic != null) list = list.Where(emp => emp.Patronumic == employeeFilter.Patronumic).ToList();
-            if (employeeFilter.EmployeePostID != null) list = list.Where(emp => emp.EmployeePostID == employeeFilter.EmployeePostID).ToList();
-            if (employeeFilter.EmployeeStatusID != null) list = list.Where(emp => emp.EmployeeStatusID == employeeFilter.EmployeeStatusID).ToList();
-            if (employeeFilter.AddressID != null) list = list.Where(emp => emp.AddressID == employeeFilter.AddressID).ToList();
-            if (employeeFilter.StateOnline != null) list = list.Where(emp => emp.StateOnline == employeeFilter.StateOnline).ToList();
-            if (employeeFilter.PhoneNumber != null) list = list.Where(emp => emp.PhoneNumber == employeeFilter.PhoneNumber).ToList();
-            //if (employeeFilter.Email != null) list = list.Where(emp => emp.Email == employeeFilter.Email).ToList();
+            List<EmployeeViewDTO> list = await this.GetAllEmployeesViewAsync();
+
+            if (employeeFilter.Name != "" && employeeFilter.Surname == "" && employeeFilter.Patronumic == "")
+                list = list.Where(x => x.Person.Name == employeeFilter.Name
+                                  || x.Person.Surname == employeeFilter.Name
+                                  || x.Person.Patronumic == employeeFilter.Name).ToList();
+
+            if (employeeFilter.Name != "" && employeeFilter.Surname != "" && employeeFilter.Patronumic == "")
+                list = list.Where(x => x.Person.Name == employeeFilter.Name && x.Person.Surname == employeeFilter.Surname
+                                    || x.Person.Surname == employeeFilter.Name && x.Person.Name == employeeFilter.Surname
+                                    || x.Person.Name == employeeFilter.Name && x.Person.Patronumic == employeeFilter.Surname).ToList();
+
+            if (employeeFilter.Name != null && employeeFilter.Surname != null && employeeFilter.Patronumic != null 
+                && employeeFilter.Name != "" && employeeFilter.Surname != "" && employeeFilter.Patronumic != "")
+                list = list.Where(x => x.Person.Name == employeeFilter.Name
+                                    && x.Person.Surname == employeeFilter.Surname
+                                    && x.Person.Name == employeeFilter.Patronumic).ToList();
+
+            if (employeeFilter.EmployeePostID != 0) list = list.Where(x => x.Person.EmployeePostID == employeeFilter.EmployeePostID).ToList();
             return list;
         }
     }

@@ -22,6 +22,6 @@ namespace RealEstateAgency.BLL.Interfaces
         Task<OperationDetails> CreateExistEmployeeAsync(string IdEmployeeDto, OperationDetails MessageSuccess, OperationDetails MessageFail);
         Task<OperationDetails> DismissEmployeeAsync(string id, OperationDetails MessageSuccess, OperationDetails MessageFail);
         Task<OperationDetails> UpdateEmployeeAsync(EmployeeDTO employeeDto, OperationDetails MessageSuccess, OperationDetails MessageFail);
-        Task<List<EmployeeDTO>> FilterEmployeeAsync(EmployeeFilterModel employeeFilter);
+        Task<List<EmployeeViewDTO>> FilterEmployeeAsync(EmployeeFilterModel employeeFilter);
     }
 }

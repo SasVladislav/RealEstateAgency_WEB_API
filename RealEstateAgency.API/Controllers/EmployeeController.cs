@@ -95,7 +95,7 @@ namespace RealEstateAgency.API.Controllers
 
         [Route("FilterEmployee")]
         [HttpPost]
-        public async Task<List<EmployeeDTO>> FilterEmployee(EmployeeFilterModel EmployeeDto)
+        public async Task<List<EmployeeViewDTO>> FilterEmployee(EmployeeFilterModel EmployeeDto)
         {
             return await employeeService.FilterEmployeeAsync(EmployeeDto);        
         }
