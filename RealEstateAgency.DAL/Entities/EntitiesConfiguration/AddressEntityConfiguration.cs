@@ -17,7 +17,7 @@ namespace RealEstateAgency.DAL.Entities.EntitiesConfiguration
             this.HasRequired(s => s.AddressStreet)
                 .WithMany(a => a.Addresses);
             
-            this.Property(a => a.HomeNumber).HasMaxLength(10).IsRequired();
+            this.Property(a => a.HomeNumber).HasMaxLength(50).IsRequired();
             this.Property(a => a.ApartmentNumber);
         }
     }

@@ -139,6 +139,10 @@
     <Compile Include="Migrations\201703142207172_StringDateContract.Designer.cs">
       <DependentUpon>201703142207172_StringDateContract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705121816156_change_langth_apartment_to_50.cs" />
+    <Compile Include="Migrations\201705121816156_change_langth_apartment_to_50.Designer.cs">
+      <DependentUpon>201705121816156_change_langth_apartment_to_50.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EF\RealEstateContext.cs" />
@@ -158,6 +162,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201703142207172_StringDateContract.resx">
       <DependentUpon>201703142207172_StringDateContract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705121816156_change_langth_apartment_to_50.resx">
+      <DependentUpon>201705121816156_change_langth_apartment_to_50.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
