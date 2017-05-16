@@ -1,4 +1,5 @@
 ﻿using RealEstateAgency.BLL.EntitiesDTO;
+using RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO;
 using RealEstateAgency.BLL.Infrastuctures;
 using RealEstateAgency.BLL.Interfaces;
 using RealEstateAgency.BLL.Specifications;
@@ -26,6 +27,12 @@ namespace RealEstateAgency.API.Controllers
 
         #region Contract
         //-----Contract
+        [Route("GetAllContractsView")]
+        [HttpGet]
+        public async Task<List<ContractViewDTO>> GetAllContractsView()
+        {
+            return await contractService.GetAllContractsViewAsync();
+        }
         [Route("GetAllContracts")]
         [HttpGet]
         public async Task<List<ContractDTO>> GetAllContracts()

@@ -13,6 +13,7 @@ using RealEstateAgency.BLL.Interfaces;
 using RealEstateAgency.BLL.Service;
 using System.Linq.Expressions;
 using RealEstateAgency.BLL.Specifications;
+using RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO;
 
 namespace RealEstateAgency.BLL.Services
 {
@@ -20,13 +21,47 @@ namespace RealEstateAgency.BLL.Services
     {
         IRepository<Contract, int> repository;
         IServiceT<Contract, ContractDTO, int> service;
+        IUserService UserService;
+        IEmployeeService EmployeeService;
+        IRealEstateService RealEstateService;
         public ContractService(IRepository<Contract, int> repository,
-                                         IServiceT<Contract, ContractDTO, int> service)
+                                         IServiceT<Contract, ContractDTO, int> service,
+                                         IUserService userService,
+                                         IEmployeeService employeeService,
+                                         IRealEstateService realEstateService)
         {
             this.repository = repository;
             this.service = service;
+            this.UserService = userService;
+            this.EmployeeService = employeeService;
+            this.RealEstateService = realEstateService;
         }
-        
+        public async Task<List<ContractViewDTO>> GetAllContractsViewAsync()
+        {
+            List<ContractViewDTO> listContractsView = new List<ContractViewDTO>();
+
+            List<ContractDTO> listContracts = await this.service.GetAllItemsAsync();
+            List<UserViewDTO> listUsersView = await this.UserService.GetAllUsersViewAsync();
+            List<EmployeeDTO> listEmployees = await this.EmployeeService.GetAllEmployeesAsync();
+            List<RealEstateViewDTO> listRealEstatesView = await this.RealEstateService.GetAllRealEstatesViewAsync();
+
+            List<ContractViewDTO> AllList = listContracts
+                .Join(
+                    listUsersView,
+                    c => c.SellerID,
+                    u => u.Person.PersonId,
+                    (c, u) => new ContractViewDTO
+                    {
+                        UserView = u,
+                        Contract = c,
+                        Employee = listEmployees.Find(e => e.PersonId == c.EmployeeID),
+                        RealEstateView = listRealEstatesView.Find(r=>r.RealEstate.RealEstateID==c.RealEstateID)
+
+                    }).ToList();
+
+            return AllList;
+        }
+
         public async Task<List<ContractDTO>> GetAllContractsAsync(Expression<Func<ContractDTO, bool>> where = null)
         {
             return await service.GetAllItemsAsync(where);

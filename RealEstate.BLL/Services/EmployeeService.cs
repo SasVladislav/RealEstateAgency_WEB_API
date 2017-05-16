@@ -25,16 +25,16 @@ namespace RealEstateAgency.BLL.Services
         IServiceT<Employee, EmployeeDTO, string> service;
         IAddressService AddressService;
         IEmployeeDismissService DismissService;
-        IKernel kernel;
+        IEmployeeStatusService StatusService;
         public EmployeeService(IRepository<Employee, string> repository,
                                          IServiceT<Employee, EmployeeDTO, string> service,
                                          IAddressService addressService,
                                          IEmployeeDismissService dismissService,
-                                         IKernel kernel)
+                                         IEmployeeStatusService statusService)
         {
             this.repository = repository;
             this.service = service;
-            this.kernel = kernel;
+            this.StatusService = statusService;
             this.AddressService = addressService;
             this.DismissService = dismissService;
         }
@@ -111,18 +111,18 @@ namespace RealEstateAgency.BLL.Services
         public async Task<OperationDetails> CreateExistEmployeeAsync(string IdEmployeeDto, OperationDetails MessageSuccess, OperationDetails MessageFail)
         {
             List<EmployeeDismissDTO> listDismEmp =
-            await kernel.Get<IEmployeeDismissService>().GetAllEmployeeDismissesByIdEmployeeAsync(IdEmployeeDto);
+            await this.DismissService.GetAllEmployeeDismissesByIdEmployeeAsync(IdEmployeeDto);
 
             EmployeeDismissDTO DismEmp = listDismEmp.Last();
             EmployeeDTO empl = await GetEmployeeByIdAsync(IdEmployeeDto);
             if (DismEmp.DismissDate!=null && empl != null)
             {
-                empl.EmployeeStatusID = (await kernel.Get<IEmployeeStatusService>().GetEmployeeStatusByParamsAsync(Status => Status.EmployeeStatusName == "Worker")).EmployeeStatusID;
+                empl.EmployeeStatusID = (await this.StatusService.GetEmployeeStatusByParamsAsync(Status => Status.EmployeeStatusName == "Worker")).EmployeeStatusID;
                 await this.UpdateEmployeeAsync(empl,
                     new EmployeeMessageSpecification().ToSuccessUpdateMessage(),
                     new EmployeeMessageSpecification().ToFailUpdateMessage());
 
-                await kernel.Get<IEmployeeDismissService>().CreateEmployeeDismissAsync(
+                await this.DismissService.CreateEmployeeDismissAsync(
                       new EmployeeDismissDTO()
                       {
                           EmployeeId = IdEmployeeDto,
@@ -140,18 +140,18 @@ namespace RealEstateAgency.BLL.Services
         public async Task<OperationDetails> DismissEmployeeAsync(string id, OperationDetails MessageSuccess, OperationDetails MessageFail)
         {
             List<EmployeeDismissDTO> listDismEmp =
-            await kernel.Get<IEmployeeDismissService>().GetAllEmployeeDismissesByIdEmployeeAsync(id);
+            await DismissService.GetAllEmployeeDismissesByIdEmployeeAsync(id);
 
             EmployeeDismissDTO DismEmp = listDismEmp.Last();
             EmployeeDTO empl = await GetEmployeeByIdAsync(id);
             if (DismEmp.DismissDate==null && empl!=null)
             {
-                empl.EmployeeStatusID = (await kernel.Get<IEmployeeStatusService>().GetEmployeeStatusByParamsAsync(Status=>Status.EmployeeStatusName == "Dismiss")).EmployeeStatusID;
+                empl.EmployeeStatusID = (await this.StatusService.GetEmployeeStatusByParamsAsync(Status=>Status.EmployeeStatusName == "Dismiss")).EmployeeStatusID;
                 await this.UpdateEmployeeAsync(empl,
                     new EmployeeMessageSpecification().ToSuccessUpdateMessage(),
                     new EmployeeMessageSpecification().ToFailUpdateMessage());
                 DismEmp.DismissDate = DateTime.Now;
-                await kernel.Get<IEmployeeDismissService>().UpdateEmployeeDismissAsync(DismEmp,
+                await DismissService.UpdateEmployeeDismissAsync(DismEmp,
                     new EmployeeDismissMessageSpecification().ToSuccessUpdateMessage(),
                     new EmployeeDismissMessageSpecification().ToFailUpdateMessage());
                 return MessageSuccess;
