@@ -48,19 +48,19 @@ namespace RealEstateAgency.BLL.Services
             List<EmployeeViewDTO> listEmployeeView = new List<EmployeeViewDTO>();
 
             List<EmployeeDTO>  listEmployees = await service.GetAllItemsAsync();
-            List<AddressDTO>  listAddresses = await AddressService.GetAllAddressesAsync();
+            List<AddressViewDTO>  listAddresses = await AddressService.GetAllAddressesViewAsync();
             List<EmployeeDismissDTO>  listDismiss = await DismissService.GetAllEmployeeDismissesAsync();
 
             List<EmployeeViewDTO> AllList = listEmployees
                 .Join(
                     listAddresses,
                     e => e.AddressID,
-                    a => a.AddressID,
+                    a => a.Address.AddressID,
                     (e, a) => new EmployeeViewDTO
                     {
 
                         Person = e,
-                        Address = a,
+                        AddressView = a,
                         Dismisses= listDismiss
                                     .Where(d=>d.EmployeeId==e.PersonId)
                                     .ToList()
@@ -93,7 +93,7 @@ namespace RealEstateAgency.BLL.Services
 
             var resultAddressCreate=await AddressService.CreateAddressAsync
                          (
-                            employeeViewDto.Address,
+                            employeeViewDto.AddressView.Address,
                             new AddressMessageSpecification().ToSuccessCreateMessage(),
                             new AddressMessageSpecification().ToFailCreateMessage()
                          );

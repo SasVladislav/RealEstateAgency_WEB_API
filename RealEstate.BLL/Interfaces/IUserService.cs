@@ -15,7 +15,7 @@ namespace RealEstateAgency.BLL.Interfaces
     public interface IUserService : IDisposable
     {
         Task<List<UserDTO>> GetAllUsersAsync(Expression<Func<UserDTO, bool>> where = null);
-        Task<List<UserViewDTO>> GetAllUsersViewAsync(Expression<Func<UserDTO, bool>> where = null);
+        Task<List<UserViewDTO>> GetAllUsersViewAsync();
         Task<UserDTO> GetUserByParamsAsync(Expression<Func<UserDTO, bool>> where);
         Task<UserDTO> GetUserByIdAsync(string id);
         Task<OperationDetails> CreateUserAsync(UserDTO userDto, OperationDetails MessageSuccess, OperationDetails MessageFail);

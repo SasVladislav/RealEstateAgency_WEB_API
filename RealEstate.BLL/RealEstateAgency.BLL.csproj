@@ -92,6 +92,7 @@
     <Compile Include="EntitiesDTO\EmployeeStatusFilterModel.cs" />
     <Compile Include="EntitiesDTO\EmployeeStatusDTO.cs" />
     <Compile Include="EntitiesDTO\EntityViewModelDTO\AbstractPersonViewModel.cs" />
+    <Compile Include="EntitiesDTO\EntityViewModelDTO\AddressViewDTO.cs" />
     <Compile Include="EntitiesDTO\EntityViewModelDTO\ContractViewDTO.cs" />
     <Compile Include="EntitiesDTO\EntityViewModelDTO\EmployeeViewDTO.cs" />
     <Compile Include="EntitiesDTO\EntityViewModelDTO\RealEstateFilterViewDTO.cs" />

@@ -13,6 +13,7 @@ using RealEstateAgency.BLL.Interfaces;
 using RealEstateAgency.BLL.Service;
 using System.Linq.Expressions;
 using RealEstateAgency.BLL.Specifications;
+using RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO;
 
 namespace RealEstateAgency.BLL.Services
 {
@@ -20,13 +21,45 @@ namespace RealEstateAgency.BLL.Services
     {
         IRepository<Address, int> repository;
         IServiceT<Address, AddressDTO, int> service;
+        IAddressCityService CityService;
+        IAddressRegionService RegionService;
+        IAddressStreetService StreetSetvice;
         public AddressService(IRepository<Address, int> repository,
-                              IServiceT<Address, AddressDTO, int> service)
+                              IServiceT<Address, AddressDTO, int> service,
+                              IAddressCityService cityService,
+                              IAddressRegionService regionService,
+                              IAddressStreetService streetSetvice)
         {
             this.repository = repository;
             this.service = service;
+            this.CityService = cityService;
+            this.RegionService = regionService;
+            this.StreetSetvice = streetSetvice;
         }
+        public async Task<List<AddressViewDTO>> GetAllAddressesViewAsync()
+        {
+            List<AddressViewDTO> listAddressView = new List<AddressViewDTO>();
 
+            List<AddressDTO> listAddresses = await service.GetAllItemsAsync();
+            List<AddressCityDTO> listCities = await CityService.GetAllAddressCitiesAsync();
+            List<AddressRegionDTO> listRegions = await RegionService.GetAllAddressRegionsAsync();
+            List<AddressStreetDTO> listStreets = await StreetSetvice.GetAllAddressStreetsAsync();            
+
+            List<AddressViewDTO> AllList = listAddresses
+                .Join(
+                    listCities,
+                    a => a.AddressCityID,
+                    c => c.AddressCityID,
+                    (a, c) => new AddressViewDTO
+                    {
+                        Address = a,
+                        AddressCity=c,
+                        AddressRegion=listRegions.Find(x=>x.AddressRegionID==a.AddressRegionID),
+                        AddressStreet=listStreets.Find(x=>x.AddressStreetID==a.AddressStreetID)                       
+                    }).ToList();
+
+            return AllList;
+        }
         public async Task<List<AddressDTO>> GetAllAddressesAsync(Expression<Func<AddressDTO, bool>> where = null)
         {
             return await service.GetAllItemsAsync(where);

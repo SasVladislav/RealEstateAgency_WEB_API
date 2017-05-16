@@ -11,7 +11,7 @@ namespace RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO
         public UserViewDTO()
         {
             Person = new UserDTO();
-            Address = new AddressDTO();
+            AddressView = new AddressViewDTO();
         }
 
     }

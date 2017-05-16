@@ -7,11 +7,13 @@ using RealEstateAgency.BLL.EntitiesDTO;
 using RealEstateAgency.BLL.Infrastuctures;
 using System.Linq.Expressions;
 using RealEstateAgency.DAL.Entities;
+using RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO;
 
 namespace RealEstateAgency.BLL.Interfaces
 {
     public interface IAddressService : IDisposable
     {
+        Task<List<AddressViewDTO>> GetAllAddressesViewAsync();
         Task<List<AddressDTO>> GetAllAddressesAsync(Expression<Func<AddressDTO, bool>> where = null);
         Task<AddressDTO> GetAddressByIdAsync(int id);
         Task<AddressDTO> GetAddressByParamsAsync(Expression<Func<AddressDTO, bool>> where);

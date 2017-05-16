@@ -8,7 +8,7 @@ namespace RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO
 {
     public class RealEstateFilterViewDTO
     {
-        public RealEstateFilterViewDTO() 
+        public RealEstateFilterViewDTO()
         {
             RealEstateFilter = new RealEstateFilterModel();
             AddressFilter = new AddressFilterModel();

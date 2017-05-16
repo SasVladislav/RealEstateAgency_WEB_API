@@ -26,16 +26,16 @@ namespace RealEstateAgency.BLL.Services
         IRepository<User, string> repository;
         IUnitOfWorkIdentity identity;
         IServiceT<User, UserDTO, string> service;
-        IKernel kernel;
+        IAddressService AddressService;
         public UserService(IRepository<User, string> repository,
                                          IUnitOfWorkIdentity identity,
                                          IServiceT<User, UserDTO, string> service,
-                                         IKernel kernel)
+                                         IAddressService addressService)
         {
             this.repository = repository;
             this.identity = identity;
             this.service = service;
-            this.kernel = kernel;
+            this.AddressService = addressService;
         }        
        
         public async Task<List<UserDTO>> GetAllUsersAsync(Expression<Func<UserDTO, bool>> where = null)
@@ -43,23 +43,18 @@ namespace RealEstateAgency.BLL.Services
             return await service.GetAllItemsAsync(where);
         }
         
-        public async Task<List<UserViewDTO>> GetAllUsersViewAsync(Expression<Func<UserDTO, bool>> where = null)
+        public async Task<List<UserViewDTO>> GetAllUsersViewAsync()
         {        
-            List<UserDTO> listUsers = new List<UserDTO>();
-            List<AddressDTO> listAddresses = new List<AddressDTO>();
-
-            
-
-            listUsers = await this.GetAllUsersAsync();
-            listAddresses = await kernel.Get<IAddressService>().GetAllAddressesAsync();
+            List<UserDTO> listUsers = await this.GetAllUsersAsync();
+            List<AddressViewDTO> listAddresses = await AddressService.GetAllAddressesViewAsync();
 
             List<UserViewDTO> AllList = listUsers.Join(
                 listAddresses,
                 u => u.AddressID,
-                a => a.AddressID,
+                a => a.Address.AddressID,
                 (u, a) => new UserViewDTO {                  
                         Person =u,
-                        Address=a
+                        AddressView=a
                 }).ToList();
 
             return AllList; 
@@ -87,9 +82,9 @@ namespace RealEstateAgency.BLL.Services
         public async Task<OperationDetails> CreateUserViewAsync(UserViewDTO userViewDto, OperationDetails MessageSuccess, OperationDetails MessageFail)
 
         {            
-            var resultAddressCreate=await kernel.Get<IAddressService>().CreateAddressAsync
+            var resultAddressCreate=await AddressService.CreateAddressAsync
                          (
-                            userViewDto.Address,
+                            userViewDto.AddressView.Address,
                             new AddressMessageSpecification().ToSuccessCreateMessage(),
                             new AddressMessageSpecification().ToFailCreateMessage()
                          );

@@ -24,12 +24,15 @@ namespace RealEstateAgency.BLL.Services
         IUserService UserService;
         IEmployeeService EmployeeService;
         IRealEstateService RealEstateService;
+        IContractTypeService ContractTypeService;
         public ContractService(IRepository<Contract, int> repository,
                                          IServiceT<Contract, ContractDTO, int> service,
                                          IUserService userService,
                                          IEmployeeService employeeService,
-                                         IRealEstateService realEstateService)
+                                         IRealEstateService realEstateService,
+                                         IContractTypeService contractTypeService)
         {
+            this.ContractTypeService = contractTypeService;
             this.repository = repository;
             this.service = service;
             this.UserService = userService;
@@ -41,6 +44,7 @@ namespace RealEstateAgency.BLL.Services
             List<ContractViewDTO> listContractsView = new List<ContractViewDTO>();
 
             List<ContractDTO> listContracts = await this.service.GetAllItemsAsync();
+            List<ContractTypeDTO> listContractTypes = await this.ContractTypeService.GetAllContractTypesAsync();
             List<UserViewDTO> listUsersView = await this.UserService.GetAllUsersViewAsync();
             List<EmployeeDTO> listEmployees = await this.EmployeeService.GetAllEmployeesAsync();
             List<RealEstateViewDTO> listRealEstatesView = await this.RealEstateService.GetAllRealEstatesViewAsync();
@@ -52,10 +56,11 @@ namespace RealEstateAgency.BLL.Services
                     u => u.Person.PersonId,
                     (c, u) => new ContractViewDTO
                     {
+                        ContractType = listContractTypes.Find(x=>x.ContractTypeID==c.ContractTypeID),
                         UserView = u,
                         Contract = c,
                         Employee = listEmployees.Find(e => e.PersonId == c.EmployeeID),
-                        RealEstateView = listRealEstatesView.Find(r=>r.RealEstate.RealEstateID==c.RealEstateID)
+                        RealEstateView = listRealEstatesView.Find(r=>r.RealEstate.RealEstateID==c.RealEstateID)                      
 
                     }).ToList();
 

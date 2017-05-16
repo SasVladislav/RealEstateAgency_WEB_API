@@ -23,32 +23,54 @@ namespace RealEstateAgency.BLL.Services
     {
         IRepository<RealEstate, int> repository;
         IServiceT<RealEstate, RealEstateDTO, int> service;
-        IKernel kernel;
+        IAddressService AddressService;
+        IRealEstateClassService ClassService;
+        IRealEstateStatusService StatusService;
+        IRealEstateTypeService TypeService;
+        IRealEstateTypeWallService TypeWallRealEstate;
         public RealEstateService(IRepository<RealEstate, int> repository,
                                  IServiceT<RealEstate, RealEstateDTO, int> service,
-                                 IKernel kernel)
+                                 IAddressService addressService,
+                                 IRealEstateClassService classService,
+                                 IRealEstateStatusService statusService,
+                                 IRealEstateTypeService typeService,
+                                 IRealEstateTypeWallService typeWallRealEstate)
         {
             this.repository = repository;
             this.service = service;
-            this.kernel = kernel;
+            this.AddressService = addressService;
+            this.ClassService = classService;
+            this.StatusService = statusService;
+            this.TypeService = typeService;
+            this.TypeWallRealEstate = typeWallRealEstate;
         }
-        public List<RealEstateViewDTO> GetRealEstateViewList(
-            List<RealEstateDTO> realestateList,List<AddressDTO> addressList)
+        public async Task<List<RealEstateViewDTO>> GetRealEstateViewList(
+            List<RealEstateDTO> realestateList,List<AddressViewDTO> addressList)
         {
             List<RealEstateViewDTO> listRealEstateView = new List<RealEstateViewDTO>();
-            Parallel.ForEach(realestateList,item=>
-            {
-            if (addressList.Where(a => a.AddressID == item.AddressID).AsParallel().Count() != 0)
-            {
-                listRealEstateView.Add(
-                                 new RealEstateViewDTO
-                                 {
-                                     RealEstate = item,
-                                     Address = addressList.Where(a=>a.AddressID==item.AddressID).AsParallel().FirstOrDefault()
-                                 }
-                                );
-                }
-            });
+            List<RealEstateClassDTO> listRealEstateClass = await ClassService.GetAllRealEstateClassesAsync();
+            List<RealEstateStatusDTO> listRealEstateStatus = await StatusService.GetAllRealEstateStatusesAsync() ;
+            List<RealEstateTypeDTO> listRealEstateType= await TypeService.GetAllRealEstateTypesAsync();
+            List<RealEstateTypeWallDTO> listRealEstateTypeWall = await TypeWallRealEstate.GetAllRealEstateTypeWallsAsync();
+            realestateList = await this.GetAllRealEstatesAsync();
+            addressList = await AddressService.GetAllAddressesViewAsync();
+            Parallel.ForEach(realestateList, item =>
+             {
+                 if (addressList.Where(a => a.Address.AddressID == item.AddressID).AsParallel().Count() != 0)
+                 {
+                     listRealEstateView.Add(
+                                      new RealEstateViewDTO
+                                      {
+                                          RealEstate = item,
+                                          RealEstateClass = listRealEstateClass.Find(x=>x.RealEstateClassID==item.RealEstateClassID),
+                                          RealEstateStatus = listRealEstateStatus.Find(x => x.RealEstateStatusID == item.RealEstateStatusID),
+                                          RealEstateType = listRealEstateType.Find(x => x.RealEstateTypeID == item.RealEstateTypeID),
+                                          RealEstateTypeWall = listRealEstateTypeWall.Find(x => x.RealEstateTypeWallID == item.RealEstateTypeWallID),
+                                          AddressView = addressList.Find(a => a.Address.AddressID == item.AddressID)
+                                      }
+                                 );
+                 }
+             });
             return listRealEstateView;
         }
         public async Task<List<RealEstateDTO>> GetAllRealEstatesAsync(Expression<Func<RealEstateDTO, bool>> where = null)
@@ -58,10 +80,10 @@ namespace RealEstateAgency.BLL.Services
         public async Task<List<RealEstateViewDTO>> GetAllRealEstatesViewAsync(Expression<Func<RealEstateDTO, bool>> where = null)
         {        
             List<RealEstateDTO> listRealEstates = new List<RealEstateDTO>();
-            List<AddressDTO> listAddresses = new List<AddressDTO>();
+            List<AddressViewDTO> listAddresses = new List<AddressViewDTO>();
             listRealEstates = await service.GetAllItemsAsync(where);
-            listAddresses = await kernel.Get<IAddressService>().GetAllAddressesAsync();
-            return this.GetRealEstateViewList(listRealEstates, listAddresses);
+            listAddresses = await AddressService.GetAllAddressesViewAsync();
+            return await this.GetRealEstateViewList(listRealEstates, listAddresses);
             
         }
 
@@ -79,9 +101,9 @@ namespace RealEstateAgency.BLL.Services
 
         public async Task<OperationDetails> CreateRealEstateAsync(RealEstateViewDTO realEstateViewDto, OperationDetails MessageSuccess, OperationDetails MessageFail)
         {
-            var resultAddress = await kernel.Get<IAddressService>().CreateAddressAsync
+            var resultAddress = await AddressService.CreateAddressAsync
                          (
-                            realEstateViewDto.Address,
+                            realEstateViewDto.AddressView.Address,
                             new AddressMessageSpecification().ToSuccessCreateMessage(),
                             new AddressMessageSpecification().ToFailCreateMessage()
                          );
@@ -146,15 +168,8 @@ namespace RealEstateAgency.BLL.Services
         }
         public async Task<List<RealEstateViewDTO>> GetAllFilterRealEstatesViewAsync(RealEstateFilterViewDTO realEstateFilterView)
         {
-            List<RealEstateDTO> listRealEstates = new List<RealEstateDTO>();
-            List<AddressDTO> listAddresses = new List<AddressDTO>();
 
-            listAddresses = await kernel.Get<IAddressService>().FilterAddressAsync(realEstateFilterView.AddressFilter);
-            listRealEstates = await this.FilterRealEstateAsync(realEstateFilterView.RealEstateFilter);
-
-            return listRealEstates.Count != 0?
-                this.GetRealEstateViewList(listRealEstates, listAddresses):
-                new List<RealEstateViewDTO>();
+            return new List<RealEstateViewDTO>();
         }
     }
 }

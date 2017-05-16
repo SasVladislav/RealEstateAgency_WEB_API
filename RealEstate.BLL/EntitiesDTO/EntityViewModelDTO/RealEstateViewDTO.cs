@@ -8,12 +8,20 @@ namespace RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO
 {
     public class RealEstateViewDTO
     {
-        public RealEstateViewDTO()
+        public RealEstateViewDTO() : base()
         {
             RealEstate = new RealEstateDTO();
-            Address = new AddressDTO();
+            RealEstateClass = new RealEstateClassDTO();
+            RealEstateStatus = new RealEstateStatusDTO();
+            RealEstateType = new RealEstateTypeDTO();
+            RealEstateTypeWall = new RealEstateTypeWallDTO();
+            AddressView = new AddressViewDTO();
         }
         public RealEstateDTO RealEstate { get; set; }
-        public AddressDTO Address { get; set; }
+        public RealEstateClassDTO RealEstateClass { get; set; }
+        public RealEstateStatusDTO RealEstateStatus { get; set; }
+        public RealEstateTypeDTO RealEstateType { get; set; }
+        public RealEstateTypeWallDTO RealEstateTypeWall { get; set; }
+        public AddressViewDTO AddressView { get; set; }
     }
 }

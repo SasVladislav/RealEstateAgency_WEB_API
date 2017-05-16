@@ -11,12 +11,14 @@ namespace RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO
         public ContractViewDTO()
         {
             Contract = new ContractDTO();
+            ContractType = new ContractTypeDTO();
             UserView = new UserViewDTO();
             RealEstateView = new RealEstateViewDTO();
             Employee = new EmployeeDTO();
         }
 
         public ContractDTO Contract { get; set; }
+        public ContractTypeDTO ContractType { get; set; }
         public UserViewDTO UserView { get; set; }
         public RealEstateViewDTO RealEstateView { get; set; }
         public EmployeeDTO Employee { get; set; }
