@@ -13,7 +13,9 @@ namespace RealEstateAgency.BLL.EntitiesDTO.EntityViewModelDTO
             Person = new EmployeeDTO();
             AddressView = new AddressViewDTO();
             Dismisses = new List<EmployeeDismissDTO>();
+            Post = new EmployeePostDTO();
         }
+        public EmployeePostDTO Post { get; set; }
         public List<EmployeeDismissDTO> Dismisses { get; set; }
     }
 }

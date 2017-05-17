@@ -26,14 +26,17 @@ namespace RealEstateAgency.BLL.Services
         IAddressService AddressService;
         IEmployeeDismissService DismissService;
         IEmployeeStatusService StatusService;
+        IEmployeePostService PostService;
         public EmployeeService(IRepository<Employee, string> repository,
                                          IServiceT<Employee, EmployeeDTO, string> service,
                                          IAddressService addressService,
                                          IEmployeeDismissService dismissService,
-                                         IEmployeeStatusService statusService)
+                                         IEmployeeStatusService statusService,
+                                         IEmployeePostService postService)
         {
             this.repository = repository;
             this.service = service;
+            this.PostService = postService;
             this.StatusService = statusService;
             this.AddressService = addressService;
             this.DismissService = dismissService;
@@ -48,6 +51,7 @@ namespace RealEstateAgency.BLL.Services
             List<EmployeeViewDTO> listEmployeeView = new List<EmployeeViewDTO>();
 
             List<EmployeeDTO>  listEmployees = await service.GetAllItemsAsync();
+            List<EmployeePostDTO> listPosts = await PostService.GetAllEmployeePostsAsync();
             List<AddressViewDTO>  listAddresses = await AddressService.GetAllAddressesViewAsync();
             List<EmployeeDismissDTO>  listDismiss = await DismissService.GetAllEmployeeDismissesAsync();
 
@@ -61,7 +65,8 @@ namespace RealEstateAgency.BLL.Services
 
                         Person = e,
                         AddressView = a,
-                        Dismisses= listDismiss
+                        Post = listPosts.Find(p=>p.EmployeePostID==e.EmployeePostID),
+                        Dismisses = listDismiss
                                     .Where(d=>d.EmployeeId==e.PersonId)
                                     .ToList()
                     }).ToList();
